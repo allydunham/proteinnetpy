@@ -1,7 +1,6 @@
 """
 Tensorflow Datasets for working with ProteinNet data
 """
-
 import tensorflow as tf
 
 def _get_tf_tuple(input_tuple, func=tf.TensorShape):
@@ -17,11 +16,11 @@ def _get_tf_tuple(input_tuple, func=tf.TensorShape):
             output.append(func(i))
     return tuple(output)
 
-def proteinnet_dataset(pn_map, batch_size,
-                       per_position=False, prefetch=0,
-                       shuffle_buffer=0, repeat=True):
+def proteinnet_tf_dataset(pn_map, batch_size,
+                          per_position=False, prefetch=0,
+                          shuffle_buffer=0, repeat=True):
     """
-    Initiate a tf.data.DataSet from a ProteinNetMap and parameters. The function
+    Initiate a tf.data.Dataset from a ProteinNetMap and parameters. The function
     mapped accross pn_map must include an output_fields attribute describing which
     bits of data it outputs (options: wt, phi, psi, chi1)
 

@@ -6,10 +6,10 @@ import random
 
 import numpy as np
 
-from .map import ProteinNetMapFunction
+from .data import LabeledFunction
 from .maths import softmin_sample, softmax_sample
 
-class ProteinNetMutator(ProteinNetMapFunction):
+class ProteinNetMutator(LabeledFunction):
     """
     Map function mutating records and outputting the mutant sequence
     in additions to other features. Produces the
