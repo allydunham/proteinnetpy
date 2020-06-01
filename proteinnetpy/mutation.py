@@ -3,6 +3,7 @@ Module containing functions for mutating ProteinNetRecords and feeding that
 data into further computations (e.g. Tensorflow)
 """
 import random
+import logging
 
 import numpy as np
 
