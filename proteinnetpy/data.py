@@ -82,6 +82,7 @@ class ProteinNetMap:
     def __init__(self, data, func, filter_errors=True, static=False):
         self.data = data
         self.func = func
+        self.filter_errors = filter_errors
         self._static = static
 
         if self._static:
