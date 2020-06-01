@@ -48,6 +48,14 @@ class ProteinNetDataset:
             if self.filter_function(record):
                 return record
 
+    def __getitem__(self, index):
+        if self.data is None:
+            parser = record_parser(self.path, **self.parser_args)
+            for _ in range(index + 1):
+                record = next(parser)
+            return record
+        return self.data[index]
+
 class LabeledFunction:
     """
     Functions labeled with output shape and data type for inputting into
@@ -97,7 +105,10 @@ class ProteinNetMap:
 
     def generate(self):
         """
-        Yield results of func applied to each record in data
+        Yield results of func applied to each record in data.
+        Provided as an entrypoint for functions expecting a
+        generator function to call to access data, for example
+        tensorflow datasets.
         """
         if self._static:
             for x in self.data:
