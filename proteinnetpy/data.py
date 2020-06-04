@@ -45,7 +45,7 @@ class ProteinNetDataset:
     def __next__(self):
         while True:
             record = next(self._parser)
-            if self.filter_function(record):
+            if self.filter_funct(record):
                 return record
 
     def __getitem__(self, index):
