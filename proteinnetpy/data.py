@@ -21,7 +21,7 @@ class ProteinNetDataset:
 
         self.path = path
         self.data = data
-        self.filter_func = lambda x: True if filter_func is None else filter_func
+        self.filter_func = (lambda x: True) if filter_func is None else filter_func
         self.preload = preload if self.data is None else None # Preload is meaningless if using data
         self._parser = None
         self.parser_args = kwargs
@@ -170,9 +170,9 @@ def make_nan_filter(rama=True, chi=True, profiles=False):
     def func(record):
         if rama and np.isnan(np.min(record.rama)):
             return False
-        if rama and np.isnan(np.min(record.chi)):
+        if chi and np.isnan(np.min(record.chi)):
             return False
-        if rama and np.isnan(np.min(record.profiles)):
+        if profiles and np.isnan(np.min(record.profiles)):
             return False
         return True
     return func
