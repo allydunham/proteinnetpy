@@ -21,7 +21,7 @@ class ProteinNetDataset:
 
         self.path = path
         self.data = data
-        self.filter_func = lambda x: True if filter_func is None else filter_func
+        self.filter_func = (lambda x: True) if filter_func is None else filter_func
         self.preload = preload if self.data is None else None # Preload is meaningless if using data
         self._parser = None
         self.parser_args = kwargs
@@ -29,8 +29,11 @@ class ProteinNetDataset:
         if self.preload and self.path is not None:
             self.data = [i for i in record_parser(self.path, **kwargs)]
 
+        print(self.filter_func(1))
         if self.data is not None:
+            print(len(self.data))
             self.data = [i for i in self.data if self.filter_func(i)]
+            print(len(self.data))
 
     def __len__(self):
         if self.data is None:
@@ -170,9 +173,9 @@ def make_nan_filter(rama=True, chi=True, profiles=False):
     def func(record):
         if rama and np.isnan(np.min(record.rama)):
             return False
-        if rama and np.isnan(np.min(record.chi)):
+        if chi and np.isnan(np.min(record.chi)):
             return False
-        if rama and np.isnan(np.min(record.profiles)):
+        if profiles and np.isnan(np.min(record.profiles)):
             return False
         return True
     return func
