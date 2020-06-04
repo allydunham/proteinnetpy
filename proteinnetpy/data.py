@@ -2,6 +2,7 @@
 Module containing methods and classes to work with ProteinNet Data
 """
 import logging
+import numpy as np
 from .parser import record_parser
 
 class ProteinNetDataset:
@@ -161,3 +162,17 @@ def profile_filter(rec):
     Filter records without profiles
     """
     return rec.profiles is not None
+
+def make_nan_filter(rama=True, chi=True, profiles=False):
+    """
+    Generate filter function checking the required fields for NaN
+    """
+    def func(record):
+        if rama and np.isnan(np.min(record.rama)):
+            return False
+        if rama and np.isnan(np.min(record.chi)):
+            return False
+        if rama and np.isnan(np.min(record.profiles)):
+            return False
+        return True
+    return func
