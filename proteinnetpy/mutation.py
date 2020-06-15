@@ -173,8 +173,8 @@ def per_residue_mutator(record, max_mutations=3, max_deleterious=0.01,
     seq = record.primary_ind.copy()
 
     # Masks identifying where deletious and neutral mutations are made
-    deleterious = np.zeros(seq.shape)
-    neutral = np.zeros(seq.shape)
+    deleterious = np.zeros(seq.shape, dtype=int)
+    neutral = np.zeros(seq.shape, dtype=int)
 
     # Sample number of substitutions [deleterious, neutral]
     num_subs = random.randint(1, max_mutations)
@@ -182,6 +182,8 @@ def per_residue_mutator(record, max_mutations=3, max_deleterious=0.01,
     num_neutral = num_subs - num_deleterious
 
     pos = None # Need a mask for sample_neutral if not making any del subs
+    no_del = True
+    no_neut = True
     if num_deleterious:
         no_del = False
         try:
