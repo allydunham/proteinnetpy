@@ -45,9 +45,9 @@ class ProteinNetMutator(LabeledFunction):
         self.weights = weights
 
         if per_position:
-            self.func = self._per_position_func
+            self.__call__ = self._per_position_func
         else:
-            self.func = self._whole_seq_func
+            self.__call__ = self._whole_seq_func
 
         # Calculate output shape/type (Mutant sequence is always output)
         self.output_shapes = [[None]]
