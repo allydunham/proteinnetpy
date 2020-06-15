@@ -64,9 +64,12 @@ class LabeledFunction:
     neural networks
     """
     def __init__(self, func, output_types, output_shapes):
-        self.__call__ = func
+        self.func = func
         self.output_types = output_types
         self.output_shapes = output_shapes
+
+    def __call__(self, x)
+        return self.func(x)
 
 class ProteinNetMap:
     """
