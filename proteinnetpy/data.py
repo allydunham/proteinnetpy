@@ -68,7 +68,7 @@ class LabeledFunction:
         self.output_types = output_types
         self.output_shapes = output_shapes
 
-    def __call__(self, x)
+    def __call__(self, x):
         return self.func(x)
 
 class ProteinNetMap:
