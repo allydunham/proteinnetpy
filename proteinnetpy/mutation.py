@@ -20,7 +20,7 @@ class ProteinNetMutator(LabeledFunction):
         ([wt_seq], mut_seq, [phi, psi, chi1]), label, [weights]
 
     mutator: mutator function
-    per_residue: whether mutants deleteriousness is tracked per sequence or per
+    per_position: whether mutants deleteriousness is tracked per sequence or per
                  mutant. Requires a compatible mutator returning a tuple of
                  mutant_seq, deleterious_inds, neutral_inds
     include: variables to return for computation, alongside mutant sequence.
@@ -164,8 +164,8 @@ def sequence_mutator(record, p_deleterious=0.5, max_mutations=3,
 
     return seq, deleterious
 
-def per_residue_mutator(record, max_deleterious=2, max_neutral=4,
-                        max_deleterious_freq=0.01, min_neutral_freq=0.1):
+def per_position_mutator(record, max_deleterious=2, max_neutral=4,
+                         max_deleterious_freq=0.01, min_neutral_freq=0.1):
     """
     Geneate mutated sequences from ProteinNetRecords and return the variant sequence along
     with labels identifying deleterious and neutral positions. Will always generate at least

@@ -1,7 +1,7 @@
 from setuptools import setup, find_packages
 
 setup(name='proteinnetpy',
-      version="0.3.0",
+      version="0.3.1",
       description="A python library for working with ProteinNet data",
       url='https://github.com/allydunham/proteinnetpy',
       author='Alistair Dunham',
