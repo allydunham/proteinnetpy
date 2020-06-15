@@ -164,11 +164,12 @@ def sequence_mutator(record, p_deleterious=0.5, max_mutations=3,
 
     return seq, deleterious
 
-def per_residue_mutator(record, max_mutations=3, max_deleterious=0.01,
-                        min_neutral=0.1, p_deleterious=0.5):
+def per_residue_mutator(record, max_deleterious=2, max_neutral=4,
+                        max_deleterious_freq=0.01, min_neutral_freq=0.1):
     """
     Geneate mutated sequences from ProteinNetRecords and return the variant sequence along
-    with labels identifying deleterious and neutral positions
+    with labels identifying deleterious and neutral positions. Will always generate at least
+    one variant.
     """
     seq = record.primary_ind.copy()
 
@@ -177,45 +178,42 @@ def per_residue_mutator(record, max_mutations=3, max_deleterious=0.01,
     neutral = np.zeros(seq.shape, dtype=int)
 
     # Sample number of substitutions [deleterious, neutral]
-    num_subs = random.randint(1, max_mutations)
-    num_deleterious = np.random.binomial(num_subs, p_deleterious)
-    num_neutral = num_subs - num_deleterious
+    num_deleterious = random.randint(0, max_deleterious)
+    num_neutral = random.randint(0 if num_deleterious else 1, max_neutral)
 
     pos = None # Need a mask for sample_neutral if not making any del subs
-    no_del = True
-    no_neut = True
+    del_subs = 0 # Number of subs actually made
+    neut_subs = 0
     if num_deleterious:
-        no_del = False
         try:
             pos, subs = sample_deleterious(num=num_deleterious,
                                            wt_seq=record.primary_ind,
                                            pssm=record.evolutionary,
-                                           max_freq=max_deleterious)
+                                           max_freq=max_deleterious_freq)
 
             seq[pos] = subs
             deleterious[pos] = 1
+            del_subs = len(pos)
 
         except ValueError:
-            # Don't mind if we can't sample variants unless we get none at all
-            no_del = True
+            pass
 
     if num_neutral:
-        no_neut = False
         try:
             pos, subs = sample_neutral(num=num_neutral,
                                        wt_seq=record.primary_ind,
                                        pssm=record.evolutionary,
-                                       min_freq=min_neutral,
+                                       min_freq=min_neutral_freq,
                                        mask=pos)
 
             seq[pos] = subs
-            deleterious[pos] = 1
+            neutral[pos] = 1
+            neut_subs = len(subs)
 
         except ValueError:
-            # Don't mind if we can't sample variants unless we get none at all
-            no_neut = True
+            pass
 
-    if no_del and no_neut:
+    if not del_subs and not neut_subs:
         raise ValueError('No valid mutations could be made')
 
     return seq, deleterious, neutral
