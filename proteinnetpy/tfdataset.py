@@ -16,8 +16,7 @@ def _get_tf_tuple(input_tuple, func=tf.TensorShape):
             output.append(func(i))
     return tuple(output)
 
-def proteinnet_tf_dataset(pn_map, batch_size,
-                          per_position=False, prefetch=0,
+def proteinnet_tf_dataset(pn_map, batch_size, prefetch=0,
                           shuffle_buffer=0, repeat=True):
     """
     Initiate a tf.data.Dataset from a ProteinNetMap and parameters. The function
