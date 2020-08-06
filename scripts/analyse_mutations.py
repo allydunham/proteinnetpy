@@ -3,6 +3,8 @@
 WARNING - Old script hasn't been updated with module at present
 Analyse performance of current mutational model
 """
+# TODO Update for new module
+# TODO Move to Mutation module?
 import os
 import argparse
 from collections import OrderedDict
