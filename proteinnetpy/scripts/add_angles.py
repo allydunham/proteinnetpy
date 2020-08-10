@@ -15,8 +15,8 @@ import gzip
 import numpy as np
 from Bio.PDB import MMCIF2Dict
 
-from .parser import record_parser
-from .maths import calc_chi1
+from proteinnetpy.parser import record_parser
+from proteinnetpy.maths import calc_chi1
 
 class PDBeList:
     """
