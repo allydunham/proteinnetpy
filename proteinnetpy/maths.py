@@ -17,8 +17,6 @@ CHI1_DICT = dict(ALA=None, GLY=None,
                  THR=['N', 'CA', 'CB', 'OG1'], TRP=['N', 'CA', 'CB', 'CG'],
                  TYR=['N', 'CA', 'CB', 'CG'], VAL=['N', 'CA', 'CB', 'CG1'])
 
-
-
 def calc_dihedral(p):
     #pylint: disable=invalid-name
     """

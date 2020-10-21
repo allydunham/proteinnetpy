@@ -52,6 +52,7 @@ class ProteinNetDataset:
     def __getitem__(self, index):
         if self.data is None:
             parser = record_parser(self.path, **self.parser_args)
+            record = None
             for _ in range(index + 1):
                 record = next(parser)
             return record
