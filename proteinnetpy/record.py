@@ -212,3 +212,18 @@ class ProteinNetRecord:
             self.rama = self.rama / factor
             self.chi = self.chi / factor
 
+    def distance_matrix(self):
+        """
+        Calculate the distance matrix between residues C-alpha atoms
+        """
+        calpha = np.copy(self.tertiary[:, 1::3])
+
+        x = calpha[0, :]
+        y = calpha[1, :]
+        z = calpha[2, :]
+
+        dx = x[..., np.newaxis] - x[np.newaxis, ...]
+        dy = y[..., np.newaxis] - y[np.newaxis, ...]
+        dz = z[..., np.newaxis] - z[np.newaxis, ...]
+
+        return (np.array([dx, dy, dz]) ** 2).sum(axis=0) ** 0.5
