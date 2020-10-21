@@ -9,6 +9,7 @@ Dihedral angles require a local PDB database to query from.
 # TODO select chain via number not letter?
 # TODO PDBeList as own module?
 import sys
+import os
 import argparse
 import gzip
 
@@ -110,13 +111,8 @@ def main():
     """Main script"""
     args = parse_args()
 
-    if args.chi:
-        pdb_db = PDBeList(args.pdb, gzip=args.gzip, default_format='mmCIF')
-
-    if args.gzip:
-        opener = gzip.open
-    else:
-        opener = open
+    pdb_db = PDBeList(args.pdb, gzip=args.gzip, default_format='mmCIF') if args.chi else None
+    opener = gzip.open if args.gzip else open
 
     for record in record_parser(args.pn_file):
         if args.chi:
@@ -132,7 +128,7 @@ def main():
                     with opener(pdb_path, 'rt') as mmcif_file:
                         mmcif = MMCIF2Dict.MMCIF2Dict(mmcif_file)
                         record.chi, record.chi_mask = calc_chi1(mmcif,
-                                                                [record.pdb_chain],
+                                                                record.pdb_chain,
                                                                 record.primary)
 
                 except FileNotFoundError:

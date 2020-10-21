@@ -8,7 +8,7 @@ setup(name='proteinnetpy',
       author_email='alistair.dunham@ebi.ac.uk',
       license='Apache 2.0',
       packages=find_packages(),
-      install_requires=['numpy', 'pandas', 'biopython'],
+      install_requires=['numpy', 'biopython'],
       extras_require={'datasets': 'tensorflow>=2.0'},
       entry_points = {
         'console_scripts': ['add_angles_to_proteinnet=proteinnetpy.scripts.add_angles:main',

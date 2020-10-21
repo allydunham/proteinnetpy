@@ -3,10 +3,7 @@
 Module containing maths functionss for working with ProteinNet datasets
 """
 import numpy as np
-import pandas as pd
 from Bio.SeqUtils import seq1
-
-# TODO refactor pandas out as it is the only module its used in?
 
 # the 4 atoms that define the CA-CB rotational angle
 CHI1_DICT = dict(ALA=None, GLY=None,
@@ -19,6 +16,8 @@ CHI1_DICT = dict(ALA=None, GLY=None,
                  PRO=['N', 'CA', 'CB', 'CG'], SER=['N', 'CA', 'CB', 'OG'],
                  THR=['N', 'CA', 'CB', 'OG1'], TRP=['N', 'CA', 'CB', 'CG'],
                  TYR=['N', 'CA', 'CB', 'CG'], VAL=['N', 'CA', 'CB', 'CG1'])
+
+
 
 def calc_dihedral(p):
     #pylint: disable=invalid-name
@@ -49,41 +48,38 @@ def calc_dihedral(p):
     y = np.dot(np.cross(b1, v), w)
     return np.arctan2(y, x)
 
-def calc_chi1(mmcif, chain, seq):
+def calc_chi1(mmcif, target_chain, seq):
     """
     Calculate chi angles from an mmCIF file.
-    mmcif: dict output of Bio.PDB.MMCIF2Dict
+    mmcif: Dict output of Bio.PDB.MMCIF2Dict
+    target_chain: Chain to calculate angles for
+    seq: Expected target chain sequence
+
     Adapted from Umberto's code:
     https://bitbucket.org/uperron/proteinnet_vep/src/master/continuous_angle_features.py
     """
-    atoms = {'group' : mmcif.get("_atom_site.group_PDB"),
-             'authour_chain' : mmcif.get("_atom_site.label_asym_id"),
-             'authour_residue_number' : mmcif.get("_atom_site.auth_seq_id"),
-             'chain' : mmcif.get("_atom_site.label_asym_id"),
-             'residue_number' : mmcif.get("_atom_site.label_seq_id"),
-             'residue_name' : mmcif.get("_atom_site.label_comp_id"),
-             'atom' : mmcif.get("_atom_site.label_atom_id"),
-             'x' :  mmcif.get("_atom_site.Cartn_x"),
-             'y' : mmcif.get("_atom_site.Cartn_y"),
-             'z' : mmcif.get("_atom_site.Cartn_z")}
-    atoms = pd.DataFrame(atoms)
-    atoms[['x', 'y', 'z']] = atoms[['x', 'y', 'z']].astype(float)
+    chain = np.array(mmcif.get("_atom_site.label_asym_id"))
+    group = np.array(mmcif.get("_atom_site.group_PDB"))
+    residue_name = np.array(mmcif.get("_atom_site.label_comp_id"))
 
     # Filter to correct atoms
-    atoms = atoms[(atoms['chain'].isin(chain)) &\
-                      (atoms['group'] == 'ATOM') &\
-                      (atoms['residue_name'].isin(CHI1_DICT.keys()))]
+    ind = ((chain == target_chain) &\
+           (group == 'ATOM') &\
+           (np.isin(residue_name, list(CHI1_DICT.keys()))))
 
-    atoms[['authour_residue_number',
-           'residue_number']] = atoms[['authour_residue_number', 'residue_number']].astype(int)
-
-    residues = atoms.groupby('residue_number')
+    residue_name = residue_name[ind]
+    residue_number = np.array(mmcif.get("_atom_site.label_seq_id"))[ind].astype(int)
+    atom = np.array(mmcif.get("_atom_site.label_atom_id"))[ind]
+    coords = np.vstack([np.array(mmcif.get("_atom_site.Cartn_x"), dtype=float)[ind],
+                        np.array(mmcif.get("_atom_site.Cartn_y"), dtype=float)[ind],
+                        np.array(mmcif.get("_atom_site.Cartn_z"), dtype=float)[ind]]
+                      ).T
 
     chi = []
     mask = []
     for i, pn_residue in enumerate(seq, 1):
         # Not all residues have structure
-        if i not in residues.groups.keys():
+        if i not in residue_number:
             chi.append(0)
             mask.append(0)
             continue
@@ -94,22 +90,23 @@ def calc_chi1(mmcif, chain, seq):
             mask.append(1)
             continue
 
-        residue = residues.get_group(i)
-        residue_name = residue['residue_name'].values[0]
+        # Select correct atom coords
+        # mmCIF dict automatically generates these with atoms correctly ordered for this opperation
+        ind = residue_number == i
+        res_name = residue_name[ind][0]
+        res_atom = atom[ind]
+        res_coords = coords[ind][np.isin(res_atom, CHI1_DICT[res_name])]
 
-        if not seq1(residue_name) == pn_residue:
+        if not seq1(res_name) == pn_residue:
             raise ValueError(f'PDB seq does not match ProteinNet seq at position {i}')
 
-        # mmCIF dict automatically generates a df with atoms correctly ordered for this opperation
-        coords = residue[residue['atom'].isin(CHI1_DICT[residue_name])][['x', 'y', 'z']].values
-
         # Don't have correct data
-        if not coords.shape == (4, 3):
+        if not res_coords.shape == (4, 3):
             chi.append(0)
             mask.append(0)
             continue
 
-        chi.append(calc_dihedral(coords))
+        chi.append(calc_dihedral(res_coords))
         mask.append(1)
 
     return np.array(chi, dtype=np.float), np.array(mask, dtype=np.int)
