@@ -142,6 +142,18 @@ def combine_filters(*args):
         return True
     return func
 
+def make_length_filter(min_length=None, max_length=None):
+    """
+    Generate a filter function checking records are within length bounds. The
+    boundary values are included.
+    """
+    min_length = 0 if min_length is None else min_length
+    max_length = float('inf') if max_length is None else max_length
+    def func(rec):
+        length = len(rec)
+        return length >= min_length and length <= max_length
+    return func
+
 def make_mask_filter(min_rama_prop=0, min_chi_prop=0, min_tertiary_prop=0):
     """
     Create basic filter functions based on record masks
