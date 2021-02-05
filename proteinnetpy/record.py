@@ -226,4 +226,8 @@ class ProteinNetRecord:
         dy = y[..., np.newaxis] - y[np.newaxis, ...]
         dz = z[..., np.newaxis] - z[np.newaxis, ...]
 
-        return (np.array([dx, dy, dz]) ** 2).sum(axis=0) ** 0.5
+        d = (np.array([dx, dy, dz]) ** 2).sum(axis=0) ** 0.5
+        d[self.mask == 0,:] = 0
+        d[:, self.mask == 0] = 0
+
+        return d
