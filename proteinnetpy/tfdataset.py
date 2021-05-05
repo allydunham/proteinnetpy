@@ -25,7 +25,6 @@ def proteinnet_tf_dataset(pn_map, batch_size, prefetch=0,
 
     pn_map: ProteinNetMap object defining the dataset
     batch_size: Minibatch size
-    per_position: Are variants labeled per position or per sequence
     prefetch: How many datapoints to prefect
     shuffle_buffer: Size of shuffle buffer
     repeat: Should dataset be endless
