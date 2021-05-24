@@ -170,6 +170,15 @@ def make_mask_filter(min_rama_prop=0, min_chi_prop=0, min_tertiary_prop=0):
 
     return func
 
+def make_id_filter(pdb_ids, pdb_chains):
+    """
+    Generate a ProteinNet dataset filter to only include specific PDB ID/Chains
+    """
+    ids = set([f"{pid.upper()}_{chn}" for pid, chn in zip(pdb_ids, pdb_chains)])
+    def func(record):
+        return f"{record.pdb_id}_{record.pdb_chain}" in ids
+    return func
+
 def profile_filter(rec):
     """
     Filter records without profiles
