@@ -5,9 +5,6 @@ Angles are added under new identifiers [RAMA] and [CHI], each with a final mask 
 Backbone angles are in rows ordered omega, phi, psi.
 Dihedral angles require a local PDB database to query from.
 """
-# TODO allow usage of a remote PDB instance?
-# TODO select chain via number not letter?
-# TODO PDBeList as own module?
 import sys
 import os
 import argparse
@@ -78,35 +75,6 @@ def chi1_missing(record, reason, skip_missing):
         record.chi = np.zeros(len(record))
         record.chi_mask = np.zeros(len(record))
 
-def parse_args():
-    """Process input arguments"""
-    parser = argparse.ArgumentParser(description=__doc__,
-                                     formatter_class=argparse.ArgumentDefaultsHelpFormatter)
-
-    parser.add_argument('pn_file', metavar='P', help="Input")
-
-    parser.add_argument('--pdb', '-p', default='data/pdb',
-                        help="Path to root of local PDB directory, expects mmCIF to be available")
-
-    parser.add_argument('--gzip', '-g', action='store_true',
-                        help="Local PDB files are gzipped")
-
-    parser.add_argument('--filter', '-f', action='store_true',
-                        help="Dont print records where no structure is found")
-
-    parser.add_argument('--rama', '-r', action='store_true',
-                        help="Calculate ramachandran angles")
-
-    parser.add_argument('--chi', '-c', action='store_true',
-                        help="Calculate chi1 angles")
-
-    args = parser.parse_args()
-
-    if not args.rama and not args.chi:
-        raise ValueError('Set either --rama or --chi, otherwise nothing is added')
-
-    return args
-
 def main():
     """Main script"""
     args = parse_args()
@@ -145,6 +113,39 @@ def main():
             record.calculate_backbone_angles()
 
         print(record)
+
+def arg_parser():
+    """Argument parser"""
+    parser = argparse.ArgumentParser(description=__doc__,
+                                     formatter_class=argparse.ArgumentDefaultsHelpFormatter)
+
+    parser.add_argument('pn_file', metavar='P', help="Input")
+
+    parser.add_argument('--pdb', '-p', default='data/pdb',
+                        help="Path to root of local PDB directory, expects mmCIF to be available")
+
+    parser.add_argument('--gzip', '-g', action='store_true',
+                        help="Local PDB files are gzipped")
+
+    parser.add_argument('--filter', '-f', action='store_true',
+                        help="Dont print records where no structure is found")
+
+    parser.add_argument('--rama', '-r', action='store_true',
+                        help="Calculate ramachandran angles")
+
+    parser.add_argument('--chi', '-c', action='store_true',
+                        help="Calculate chi1 angles")
+
+    return parser
+
+def parse_args():
+    """Process input arguments"""
+    args = arg_parser().parse_args()
+
+    if not args.rama and not args.chi:
+        raise ValueError('Set either --rama or --chi, otherwise nothing is added')
+
+    return args
 
 if __name__ == "__main__":
     main()

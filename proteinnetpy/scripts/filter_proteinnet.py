@@ -11,7 +11,7 @@ def main():
     """
     Filter a ProteinNet file to only include records from a list of IDs
     """
-    args = parse_args()
+    args = arg_parser().parse_args()
 
     id_list = args.ids
     if args.file:
@@ -31,7 +31,7 @@ def main():
     for rec in data:
         print(rec, file=sys.stdout)
 
-def parse_args():
+def arg_parser():
     """Process arguments"""
     parser = argparse.ArgumentParser(description=__doc__,
                                      formatter_class=argparse.ArgumentDefaultsHelpFormatter)
@@ -44,7 +44,7 @@ def parse_args():
     parser.add_argument('--exclude', '-e', action="store_true", help="Exclude IDs")
 
 
-    return parser.parse_args()
+    return parser
 
 if __name__ == "__main__":
-    main(parse_args())
+    main()
