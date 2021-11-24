@@ -3,6 +3,8 @@ Tensorflow Datasets for working with ProteinNet data
 """
 import tensorflow as tf
 
+__all__ = ["proteinnet_tf_dataset"]
+
 def _get_tf_tuple(input_tuple, func=tf.TensorShape):
     """
     Convert a generic nested tuple to a nested tuple of tensorflow objects.

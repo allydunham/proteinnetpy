@@ -10,6 +10,9 @@ import numpy as np
 from .data import LabeledFunction
 from .maths import softmin_sample, softmax_sample
 
+__all__ = ["ProteinNetMutator", "sequence_mutator", "per_position_mutator",
+           "sample_deleterious", "sample_neutral"]
+
 class ProteinNetMutator(LabeledFunction):
     """
     Map function mutating records and outputting the mutant sequence

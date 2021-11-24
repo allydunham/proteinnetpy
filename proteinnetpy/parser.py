@@ -5,6 +5,8 @@ import logging
 import numpy as np
 from .record import ProteinNetRecord
 
+__all__ = ["record_parser", "fetch_record"]
+
 # ProteinNet file constants
 LINES_PER_RECORD = 33 # currently doesn't include secondary structure
 PROTEINNET_FIELDS = ['id', 'primary', 'secondary', 'tertiary', 'evolutionary',

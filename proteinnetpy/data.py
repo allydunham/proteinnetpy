@@ -5,6 +5,10 @@ import logging
 import numpy as np
 from .parser import record_parser
 
+__all__ = ["ProteinNetDataset", "LabeledFunction", "ProteinNetMap", "combine_filters",
+           "make_length_filter", "make_mask_filter", "make_id_filter", "profile_filter",
+           "make_nan_filter"]
+
 class ProteinNetDataset:
     """
     Container for ProteinNetRecords, supporting streaming from files or loading into memory

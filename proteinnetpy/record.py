@@ -6,6 +6,8 @@ import re
 import numpy as np
 from .maths import calc_dihedral, add_neighbours
 
+__all__ = ["ProteinNetRecord"]
+
 # Regexs for recognising different ProteinNet file ID patterns
 PDB_REGEX = re.compile(r"^[0-9A-Z]{4}_[0-9]*_[A-Z0-9]*$")
 ASTRAL_REGEX = re.compile(r"^[0-9A-Z]{4}_[a-z0-9\-]{7}$")

@@ -5,6 +5,8 @@ Module containing maths functionss for working with ProteinNet datasets
 import numpy as np
 from Bio.SeqUtils import seq1
 
+__all__ = ["calc_dihedral", "calc_chi1", "softmin_sample", "softmax_sample"]
+
 # the 4 atoms that define the CA-CB rotational angle
 CHI1_DICT = dict(ALA=None, GLY=None,
                  ARG=['N', 'CA', 'CB', 'CG'], ASN=['N', 'CA', 'CB', 'CG'],
