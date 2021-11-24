@@ -1,7 +1,7 @@
 """
 A python library for working with ProteinNet data (see https://github.com/aqlaboratory/proteinnet)
 """
-__version__ = "0.5.3"
+__version__ = "1.0.0"
 
 import logging
 
