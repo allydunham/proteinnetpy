@@ -1,8 +1,5 @@
-proteinnetpy package
-====================
-
-Mutation
-----------------------------
+proteinnetpy.mutation
+=====================
 
 .. automodule:: proteinnetpy.mutation
    :members:

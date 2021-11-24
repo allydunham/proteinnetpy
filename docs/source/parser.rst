@@ -1,8 +1,5 @@
-proteinnetpy package
-====================
-
-Parser module
---------------------------
+proteinnetpy.parser
+===================
 
 .. automodule:: proteinnetpy.parser
    :members:

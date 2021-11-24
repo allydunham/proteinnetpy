@@ -1,8 +1,5 @@
-proteinnetpy package
-====================
-
-Maths
--------------------------
+proteinnetpy.maths
+==================
 
 .. automodule:: proteinnetpy.maths
    :members:

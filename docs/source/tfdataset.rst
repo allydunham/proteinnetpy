@@ -1,8 +1,5 @@
-proteinnetpy package
-====================
-
-TFDataset module
------------------------------
+proteinnetpy.tfdataset
+======================
 
 .. automodule:: proteinnetpy.tfdataset
    :members:

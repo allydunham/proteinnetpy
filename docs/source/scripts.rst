@@ -1,5 +1,5 @@
-proteinnetpy.scripts package
-============================
+Command Line Tools
+==================
 
 ProteinNetPy contains several utility scripts to help work with ProteinNet files.
 

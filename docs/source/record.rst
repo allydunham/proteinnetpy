@@ -1,11 +1,7 @@
-proteinnetpy package
-====================
-
-Record module
---------------------------
+proteinnetpy.record
+===================
 
 .. automodule:: proteinnetpy.record
    :members:
    :undoc-members:
    :show-inheritance:
-   

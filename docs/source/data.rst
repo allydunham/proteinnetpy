@@ -1,8 +1,5 @@
-proteinnetpy package
-====================
-
-Data
-------------------------
+proteinnetpy.data
+=================
 
 .. automodule:: proteinnetpy.data
    :members:
