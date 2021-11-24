@@ -5,4 +5,10 @@ ProteinNetPy
    :maxdepth: 2
    :caption: Contents:
 
-   modules
+   record
+   data
+   parser
+   tfdataset
+   mutation
+   maths
+   scripts

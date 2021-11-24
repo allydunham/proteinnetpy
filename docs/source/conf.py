@@ -29,7 +29,7 @@ release = '0.5.2'
 # extensions coming with Sphinx (named 'sphinx.ext.*') or your custom
 # ones.
 extensions = [
-    'sphinx.ext.autodoc', 'sphinx.ext.napoleon', 'sphinx_rtd_theme'
+    'sphinx.ext.autodoc', 'sphinx.ext.napoleon', 'sphinx_rtd_theme', 'sphinxarg.ext'
 ]
 
 # Napoleon conf
