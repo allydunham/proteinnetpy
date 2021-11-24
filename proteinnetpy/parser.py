@@ -16,15 +16,29 @@ PROTEINNET_FIELDS = ['id', 'primary', 'secondary', 'tertiary', 'evolutionary',
 def record_parser(path, max_len=float('inf'), excluded_fields=None, normalise_angles=False,
                   profiles=None):
     """
-    Generator yielding records from a ProteinNet file one by one.
-    excluded_fields lets you specify a list of fields to exclude from the output.
-    You cannot exclude id or primary.
+    Parse records from a ProteinNet file.
 
-    path: path to ProteinNet files
-    max_len: max length of sequences to keep
-    excluded_fields: list of fields to exclude
-    normalise_angles: Normalise backbone/chiral angles to be -1 to 1 rather than -pi to pi
-    profiles: function to supply profiles for a given record. Should return None if not available.
+    Generator yielding records from a ProteinNet file in record.ProteinNetRecord form.
+    It also allows some minimal manipulation of records before creating a data.ProteinNetDataset, although most filtering is assumed to be done at the dataset stage.
+    In general, this function does not need to be used directly by end users, since the data.ProteinNetDataset class manages loading from files and allows keywords to be passed to the parser.
+
+    Parameters
+    ----------
+    path              : str
+        Path to ProteinNet file
+    max_len           : int
+        Max length of sequences to keep
+    excluded_fields   : list
+        Fields to exclude from the output record, reducing memory usage if only specific data is required. You cannot exclude id or primary.
+    normalise_angles  : bool
+        Normalise backbone/chiral angles to be -1 to 1 rather than -pi to pi
+    profiles          : function
+        Function returning positional profiles for a given record or None if profiles are not available for that record. These profiles can be any additional data associated with positions in a protein, for example the output of a protein language model or surface accessibility data. Few expectations are placed on them in downstream code and equally they are rarely used.
+
+    Yields
+    ------
+    ProteinNetRecord
+        Records parsed and processed from the input ProteinNet file.
     """
     if excluded_fields is None:
         excluded_fields = []
@@ -68,7 +82,21 @@ def record_parser(path, max_len=float('inf'), excluded_fields=None, normalise_an
 
 def _read_proteinnet_field(id_line, rec_dict, file):
     """
-    Read a field from a ProteinNet file and add it to rec_dict
+    Read a field from an open ProteinNet file and add it to rec_dict
+
+    Read a ProteinNet field from an open ProteinNet file and add it to rec_dict.
+    The ID line should contain a section header (e.g. [ID] or [PRIMARY]), which will be used to determine how to parse the following section.
+    Nothing is returned, instead the data is added to `rec_dict`, which will build up into a dictionary with all data for the current record.
+    This function is primarily used internally by record_parser.
+
+    Parameters
+    ----------
+    id_line   : str
+        ID line of the following section in the ProteinNet file.
+    rec_dict  : dict
+        Dictionary of data for the current record
+    file      : file_handle
+        Open ProteinNet file, from which the id_line has just been read.
     """
     identifier = id_line.strip('\n[]').lower()
     if identifier == 'id':
@@ -116,32 +144,24 @@ def _read_proteinnet_field(id_line, rec_dict, file):
 
 def fetch_record(record_id, path):
     """
-    Retrieve a particular record from a ProteinNet file
+    Retrieve a record from a ProteinNet file
+
+    Fetch a specific record from a ProteinNet file by its ID.
+
+    Parameters
+    ----------
+    record_id : str
+        ID of the record to fetch.
+    path      : str
+        Path to a ProteinNet file to search in.
+
+    Returns
+    -------
+    ProteinNetRecord or None
+        Record with the given ID, if found, otherwise None.
     """
     for pn_record in record_parser(path):
         if pn_record.id == record_id:
             return pn_record
 
     return None
-
-def load_unirep(record, root=None):
-    """
-    Load unirep profile for a ProteinNetRecord
-    """
-    # Profiles that we have have stop column and M to start if there wasn't one
-    file_id = record.id
-    if '#' in file_id: # validation IDs are of the form 30#PDB_ID
-        file_id = file_id.split('#')[1]
-
-    try:
-        profs = np.load(f"{root}/{file_id}.fa.npy")[:-1,:]
-    except FileNotFoundError as err:
-        logging.warning('Record %s: file %s not found', record.id, err.filename)
-        return None
-
-    # Check if there's an appended Met
-    if profs.shape[0] > len(record):
-        profs = profs[1:,:]
-
-    return profs
-
