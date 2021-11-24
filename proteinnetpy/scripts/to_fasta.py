@@ -1,7 +1,6 @@
 """
 Generate a fasta file from a ProteinNet text data file
 """
-import sys
 import argparse
 import textwrap
 
