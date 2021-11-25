@@ -23,12 +23,94 @@ class ProteinNetRecord:
     # pylint: disable=invalid-name
     # pylint: disable=redefined-builtin
     """
+    Record from a ProteinNet dataset.
+
     A record from a ProteinNet database, with support for torsion angles and additional
-    per-position profiles (e.g. precalculated from something like UniRep)
+    per-position profiles (e.g. precalculated from a language model).
+    The only required attributes are id and primary, allow various others are derived from these on initialisation.
+    Many attributes are identified from the ID, based on the format of the main ProteinNet files IDs.
+    This will likely fail if other data is put into the same format, but should not reduce functionality much as only a few specific functions utilise this data, which is mainly for information purposes.
+
+    Attributes
+    ----------
+    id                 : str
+        Record ID
+    split              : {'training', 'testing', 'validation'}
+        The data split the record comes from. Identified from the ID.
+    record_class       : str
+        Split the record comes from, for validation records. Identified from the ID.
+    source             : str
+        Source of the record. Identified from the ID.
+    casp_id            : str
+        CASP ID of the record, for records in the test set sourced from CASP entries. Identified from the ID.
+    astral_id          : str
+        Astral ID of the record, for those sourced from Astral. Identified from the ID.
+    pdb_id             : str
+        PDB ID of the record, for those deriving from a PDB entry. Identified from the ID.
+    pdb_chain_number   : str
+        Numeric PDB Chain of the record, for those deriving from a PDB entry. Identified from the ID.
+    pdb_chain          : str
+        Alphabetical PDB Chain of the record, for those deriving from a PDB entry. Identified from the ID.
+    evolutionary       : float ndarray (20, N)
+        Variant frequencies accross a multiple sequence alignment for this protein.
+    info_content       : float ndarray (N,)
+        Information content of the MSA at each position.
+    primary            : U1 ndarray (N,)
+        Protein sequence in single letter code form.
+    primary_ind        : int ndarray (N,)
+        Protein sequence in integer form, based on the index of amino acids in single letter alphabetical order (see record.AMINO_ACIDS and record.AA_HASH).
+    secondary          : ndarray
+        Protein secondary structure (currently not included in the dataset)
+    tertiary           : float ndarray (3, 3N)
+        Residue atom coordinates. Rows are x,y,z cartesian coordinates. Each residue includes 3 columns for the N, CA and C' backbone atoms. This means the atom at position i starts in column 3i and a matrix of N/CA/C' atom coordinates can be extracted with indeces in the arithmetic series 3x + c with c = 0 for N, c = 1 for CA or c = 2 for C'.
+    mask               : int ndarray (N,)
+        Mask indicating which residues have structural information. Residues marked with 1 have information present. The mask needs to be tripled to apply to the tertiary structure array. None if tertiary is None.
+    rama               : float ndarray (3, N)
+        Backbone angles for each residue, calculated from tertiary. The rows (first index) represent omega, phi and psi angles. Either in radians or normalised between -1 and 1.
+    rama_mask          : int ndarray (N,)
+        Mask indicating which residues have backbone angles, with 1 indicating information is present. None if rama is None.
+    chi                : float ndarray (N,)
+        Chi1 side chain rotamer conformation. Either in radians or normalised between -1 and 1. This requires more information than `tertiary` provides so can only be calculated from the full structural model (for example with the add_angles_to_proteinnet script).
+    chi_mask           : int ndarray (N,)
+        Mask indicating which residues have rotamer angles. None if chi is None.
+    profiles           : ndarray (X, N)
+        Additional profiles for each amino acid position. Can contain any additional information the user requires.
+    _normalised_angles : bool
+        Torsion angles have been normalised to vary between -1 and 1, rather than -pi to pi.
     """
     def __init__(self, id, primary, evolutionary=None, info_content=None, secondary=None,
                  tertiary=None, mask=None, rama=None, rama_mask=None, chi=None,
                  chi_mask=None, profiles=None):
+        """
+        Initialise the record.
+
+        Parameters
+        ----------
+        id                 : str
+            Record ID
+        primary            : U1 ndarray (N,)
+            Protein sequence in single letter code form.
+        evolutionary       : float ndarray (20, N)
+            Variant frequencies accross a multiple sequence alignment for this protein.
+        info_content       : float ndarray (N,)
+            Information content of the MSA at each position.
+        secondary          : ndarray
+            Protein secondary structure (currently not included in the dataset)
+        tertiary           : float ndarray (3, 3N)
+            Residue atom coordinates. Rows are x,y,z cartesian coordinates. Each residue includes 3 columns for the N, CA and C' backbone atoms. This means the atom at position i starts in column 3i and a matrix of N/CA/C' atom coordinates can be extracted with indeces in the arithmetic series 3x + c with c = 0 for N, c = 1 for CA or c = 2 for C'.
+        mask               : int ndarray (N,)
+            Mask indicating which residues have structural information. Residues marked with 1 have information present. The mask needs to be tripled to apply to the tertiary structure array. None if tertiary is None.
+        rama               : float ndarray (3, N)
+            Backbone angles for each residue, calculated from tertiary. The rows (first index) represent omega, phi and psi angles. Either in radians or normalised between -1 and 1.
+        rama_mask          : int ndarray (N,)
+            Mask indicating which residues have backbone angles, with 1 indicating information is present. None if rama is None.
+        chi                : float ndarray (N,)
+            Chi1 side chain rotamer conformation. Either in radians or normalised between -1 and 1. This requires more information than `tertiary` provides so can only be calculated from the full structural model (for example with the add_angles_to_proteinnet script).
+        chi_mask           : int ndarray (N,)
+            Mask indicating which residues have rotamer angles. None if chi is None.
+        profiles           : ndarray (X, N)
+            Additional profiles for each amino acid position. Can contain any additional information the user requires.
+        """
         self.id = id
 
         # Manage the different properties for Testing/Validation/Training sets
@@ -76,6 +158,11 @@ class ProteinNetRecord:
     def _set_id_properties(self, id):
         """
         Extract details from the identifier
+
+        Paramters
+        ---------
+        id : str
+            Record ID.
         """
         if CASP_REGEX.match(id):
             self.split = 'testing'
@@ -165,15 +252,32 @@ class ProteinNetRecord:
 
     def enumerate_sequence(self, aa_hash=AA_HASH):
         """
-        Generate a numeric representation of the sequence with each
-        amino acid represented by an interger index, as mapped in aa_hash.
+        Generate a numeric representation of the sequence with each amino acid represented by an interger index.
+
+        Generate a numeric representation of the sequence with each amino acid represented by an interger index. The default indeces are in single letter code alphabetical order. This function is used in __init__ to generate primary_ind.
+
+        Parameters
+        ----------
+        aa_hash : dict, optional
+            Dictionary mapping single letter codes to ints. Can be replaced to interface with a model that enumerates amino acids differently. For example Unirep orders amino acids alphabetically by full name.
         """
         return np.array([aa_hash[aa] for aa in self.primary], dtype=np.int)
 
     def get_one_hot_sequence(self, aa_hash=AA_HASH):
         """
         Generate a 1-hot encoded matrix of the proteins sequence.
-        aa_hash maps amino acids to their row number.
+
+        Generate a 1-hot encoded matrix of the proteins sequence. The default indeces are in single letter code alphabetical order, which can be altered to feed into models expecting different orders.
+
+        Parameters
+        ----------
+        aa_hash : dict, optional
+            Dictionary mapping single letter codes to ints. Can be replaced to interface with a model that enumerates amino acids differently. For example Unirep orders amino acids alphabetically by full name.
+
+        Returns
+        -------
+        int ndarray (20, N)
+            One-hot encoded primary sequence for the record. Matrix with 20 rows representing each amino acid. Each column has a single 1 in the row of its amino acid.
         """
         num_aas = max(v for k, v in aa_hash.items()) + 1
         indeces = np.array([aa_hash[aa] for aa in self.primary])
@@ -184,8 +288,9 @@ class ProteinNetRecord:
 
     def calculate_backbone_angles(self):
         """
-        Calculate Omega, Phi, and Psi from the ProteinNet 3D coordinates and set them
-        as instance variables
+        Calculate Omega, Phi, and Psi backbone angles and set the rama attribute.
+
+        Calculate Omega, Phi, and Psi backbone angles from the tertiary structure included in ProteinNet, and set the results as the rama attribute. The rama_mask attribute is also caculated and set.
         """
         coords = self.tertiary.T
         psi = np.array([calc_dihedral(coords[i:(i+4)]) for i in range(0, 3*len(self)-3, 3)] + [0])
@@ -206,8 +311,14 @@ class ProteinNetRecord:
 
     def normalise_angles(self, factor=np.pi):
         """
-        Normalise backbone and chi angles to betweeen -1 and 1. Will only
-        apply normalisation once per record.
+        Normalise backbone and chi angles to betweeen -1 and 1.
+
+        Normalise backbone and chi angles to betweeen -1 and 1. Also sets a flag indicating angles have been normalised, and does nothing if this is set to prevent normalising twice.
+
+        Parameters
+        ----------
+        factor : numeric
+            Factor to normalise angles by. It will not generally be useful to change this since the package naturally works in radians between -pi and pi, but may be useful if you need to work with angles in other formats.
         """
         if not self._normalised_angles:
             self._normalised_angles = True
@@ -216,7 +327,14 @@ class ProteinNetRecord:
 
     def distance_matrix(self):
         """
-        Calculate the distance matrix between residues C-alpha atoms
+        Calculate the distance matrix between residues C-alpha atoms.
+
+        Calculate the distance matrix between residues C-alpha atoms. ProteinNet coordinates and therefore the distance matrix are in nanometers.
+
+        Returns
+        -------
+        float ndarray (N, N)
+            Distance matrix where X[i,j] gives the distance in nanometers between residue i and j.
         """
         calpha = np.copy(self.tertiary[:, 1::3])
 
