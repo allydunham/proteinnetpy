@@ -1,4 +1,4 @@
-# ProteinNetPy 0.5.3
+# ProteinNetPy 1.0.0
 [![DOI](https://zenodo.org/badge/267846791.svg)](https://zenodo.org/badge/latestdoi/267846791)
 
 A python library for working with [ProteinNet](https://github.com/aqlaboratory/proteinnet) text data, allowing you to easily load, stream and filter data, map functions across records and produce TensorFlow datasets.
