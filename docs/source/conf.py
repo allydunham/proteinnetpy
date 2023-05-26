@@ -20,7 +20,7 @@ copyright = '2021, Alistair S. Dunham'
 author = 'Alistair S. Dunham'
 
 # The full version, including alpha/beta/rc tags
-release = '0.5.2'
+release = '1.0.1'
 
 
 # -- General configuration ---------------------------------------------------

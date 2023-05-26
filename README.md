@@ -1,5 +1,8 @@
-# ProteinNetPy 1.0.0
+# ProteinNetPy 1.0.1
+<!-- badges: start -->
 [![DOI](https://zenodo.org/badge/267846791.svg)](https://zenodo.org/badge/latestdoi/267846791)
+[![Documentation Status](https://readthedocs.org/projects/proteinnetpy/badge/?version=latest)](https://proteinnetpy.readthedocs.io/en/latest/?badge=latest)
+<!-- badges: end -->
 
 A python library for working with [ProteinNet](https://github.com/aqlaboratory/proteinnet) text data, allowing you to easily load, stream and filter data, map functions across records and produce TensorFlow datasets.
 For details of the dataset see the ProteinNet [Bioinformatics paper](https://bmcbioinformatics.biomedcentral.com/articles/10.1186/s12859-019-2932-0).
@@ -7,9 +10,7 @@ Documentation for all functions of the module is available [here](https://protei
 
 ## Install
 
-1. `git clone https://github.com:allydunham/proteinnetpy`
-2. `cd proteinnetpy`
-3. `pip install .`
+`pip install git+https://github.com:allydunham/proteinnetpy`
 
 ## Requirements
 

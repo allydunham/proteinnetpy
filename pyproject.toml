@@ -1,0 +1,47 @@
+[build-system]
+requires = ["setuptools"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "proteinnetpy"
+description = "Read, process and write ProteinNet data"
+readme = {file = "README.md", content-type = "text/markdown"}
+license = {file = "LICENSE", content-type = "text"}
+keywords = [
+  "protein", "bioinformatics", "proteinnet", "machine learning"
+]
+authors = [
+  { name = "Alistair Dunham", email = "ad44@sanger.ac.uk" }
+]
+maintainers = [
+  { name = "Alistair Dunham", email = "ad44@sanger.ac.uk" }
+]
+requires-python = ">=3"
+dependencies = [
+  "numpy",
+  "biopython"
+]
+dynamic = ['version']
+
+[project.optional-dependencies]
+datasets = [
+  "tensorflow >=2, <3; sys_platform != 'darwin' or platform_machine != 'arm64'",
+  "tensorflow-macos >=2, <3; sys_platform == 'darwin' and platform_machine == 'arm64'"
+]
+
+[project.urls]
+Repository = "https://github.com/allydunham/proteinnetpy"
+Documentation = "https://proteinnetpy.readthedocs.io/en/latest/"
+Publication = "https://doi.org/10.1186/s13059-023-02948-3"
+
+[project.scripts]
+add_angles_to_proteinnet = "proteinnetpy.scripts.add_angles:main"
+proteinnet_to_fasta = "proteinnetpy.scripts.to_fasta:main"
+filter_proteinnet = "proteinnetpy.scripts.filter_proteinnet:main"
+
+[tool.setuptools]
+include-package-data = false
+zip-safe = true
+
+[tool.setuptools.packages]
+find = {}
