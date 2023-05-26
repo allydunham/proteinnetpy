@@ -4,6 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "proteinnetpy"
+version = "1.0.1"
 description = "Read, process and write ProteinNet data"
 readme = {file = "README.md", content-type = "text/markdown"}
 license = {file = "LICENSE", content-type = "text"}
@@ -21,7 +22,6 @@ dependencies = [
   "numpy",
   "biopython"
 ]
-dynamic = ['version']
 
 [project.optional-dependencies]
 datasets = [
