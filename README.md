@@ -10,6 +10,10 @@ Documentation for all functions of the module is available [here](https://protei
 
 ## Install
 
+`pip install proteinnetpy`
+
+Or install the development version from Github:
+
 `pip install git+https://github.com:allydunham/proteinnetpy`
 
 ## Requirements
